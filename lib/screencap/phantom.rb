@@ -12,9 +12,9 @@ module Screencap
         output: path
       }.merge(cloned_args).collect {|k,v| "#{k}=#{v}"}
       puts phantom_args, RASTERIZE.to_s, params
-      result = Phantomjs.run(phantom_args, RASTERIZE.to_s, *params)
+      result = Phantomjs.run(*phantom_args, RASTERIZE.to_s, *params)
       puts result if(cloned_args[:debug])
-      raise Screencap::Error, "Could not load URL #{url}" if result.match /Unable to load/
+      raise Screencap::Error, "Could not load URL #{url}, message: #{result.inspect}" if result.match /Unable to load/
     end
 
     def quoted_args(args)
@@ -27,13 +27,13 @@ module Screencap
       arg = arg + "'" unless arg.ends_with?("'")
       arg
     end
-    
+
     private
     def self.phantomjs_config(args)
       opts = args[:phantomjs]
       args.delete(:phantomjs)
-      return opts.collect {|k,v| "#{k}=#{v}"}.join(" ") if opts
-      ""
+      return opts.collect {|k,v| "#{k}=#{v}"} if opts
+      []
     end
   end
 end
